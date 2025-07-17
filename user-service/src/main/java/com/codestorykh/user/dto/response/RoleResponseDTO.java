@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CreateRoleResponseDTO extends BaseDTO {
+public class RoleResponseDTO extends BaseDTO {
 
     private Long id;
 

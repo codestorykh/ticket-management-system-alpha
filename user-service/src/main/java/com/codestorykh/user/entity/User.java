@@ -60,4 +60,9 @@ public class User extends BaseEntity{
         this.roles.add(role);
     }
 
+    // Helper method to add a group to the user
+    public void addGroup(Group group) {
+        this.groups.add(group);
+    }
+
 }

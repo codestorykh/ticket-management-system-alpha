@@ -8,6 +8,7 @@
         <artifactId>ticket-management-system-alpha</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <packaging>war</packaging>
 
     <artifactId>common</artifactId>
 

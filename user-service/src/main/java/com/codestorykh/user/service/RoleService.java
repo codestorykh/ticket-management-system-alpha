@@ -1,22 +1,26 @@
 package com.codestorykh.user.service;
 
 import com.codestorykh.user.dto.request.CreateRoleRequestDTO;
-import com.codestorykh.user.dto.response.CreateRoleResponseDTO;
+import com.codestorykh.user.dto.response.RoleResponseDTO;
+import com.codestorykh.user.entity.Role;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RoleService {
 
-    CreateRoleResponseDTO create(CreateRoleRequestDTO createRoleRequestDTO);
+    RoleResponseDTO create(CreateRoleRequestDTO createRoleRequestDTO);
 
-    CreateRoleResponseDTO update(Long id, CreateRoleRequestDTO createRoleRequestDTO);
+    RoleResponseDTO update(Long id, CreateRoleRequestDTO createRoleRequestDTO);
 
-    CreateRoleResponseDTO findById(Long id);
+    RoleResponseDTO findById(Long id);
 
-    CreateRoleResponseDTO findByName(String name);
+    RoleResponseDTO findByName(String name);
 
-    List<CreateRoleResponseDTO> findAll();
+    List<Role> findByNameIn(Set<String> roleNames);
 
-    List<CreateRoleResponseDTO> findAllRoleActive(String status);
+    List<RoleResponseDTO> findAll();
+
+    List<RoleResponseDTO> findAllRoleActive(String status);
 
 }

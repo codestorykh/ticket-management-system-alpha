@@ -2,10 +2,14 @@ package com.codestorykh.user.entity;
 
 import com.codestorykh.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "tt_permission")
 public class Permission extends BaseEntity {
@@ -28,51 +32,24 @@ public class Permission extends BaseEntity {
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
     private Set<Group> groups = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    // Helper methods
+    public void addRole(Role role) {
+        this.roles.add(role);
+        role.getPermissions().add(this);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+        role.getPermissions().remove(this);
     }
 
-    public String getName() {
-        return name;
+    public void addGroup(Group group) {
+        this.groups.add(group);
+        group.getPermissions().add(this);
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public Set<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(Set<Group> groups) {
-        this.groups = groups;
+    public void removeGroup(Group group) {
+        this.groups.remove(group);
+        group.getPermissions().remove(this);
     }
 }

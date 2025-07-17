@@ -2,7 +2,6 @@ package com.codestorykh.user.controller;
 
 import com.codestorykh.user.dto.request.CreateUserRequestDTO;
 import com.codestorykh.user.dto.response.AuthResponse;
-import com.codestorykh.user.dto.response.CreateUserResponseDTO;
 import com.codestorykh.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

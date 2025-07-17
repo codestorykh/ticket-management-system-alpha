@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CreateUserResponseDTO extends BaseDTO {
+public class UserResponseDTO extends BaseDTO {
 
     @JsonProperty("id")
     private Long id;
