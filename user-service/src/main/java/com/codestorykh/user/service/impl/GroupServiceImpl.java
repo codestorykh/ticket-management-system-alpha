@@ -9,10 +9,10 @@ import com.codestorykh.user.entity.Permission;
 import com.codestorykh.user.entity.Role;
 import com.codestorykh.user.entity.User;
 import com.codestorykh.user.repository.GroupRepository;
+import com.codestorykh.user.repository.RoleRepository;
 import com.codestorykh.user.repository.UserRepository;
 import com.codestorykh.user.service.GroupService;
 import com.codestorykh.user.service.PermissionService;
-import com.codestorykh.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
-    private final RoleService roleService;
+    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final PermissionService permissionService;
@@ -40,7 +40,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         Set<Role> roles = request.getRoles() != null
-                ? new HashSet<>(roleService.findByNameIn(request.getRoles()))
+                ? new HashSet<>(roleRepository.findByNameIn(request.getRoles()))
                 : Set.of();
         Set<Permission> permissions = request.getPermissions() != null
                 ? new HashSet<>(permissionService.getPermissionsByNameIn(request.getPermissions()))
@@ -71,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         if (request.getRoles() != null) {
-            Set<Role> roles = new HashSet<>(roleService.findByNameIn(request.getRoles()));
+            Set<Role> roles = new HashSet<>(roleRepository.findByNameIn(request.getRoles()));
             group.setRoles(roles);
         }
 

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,14 +19,8 @@ public class User extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
-
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "password", nullable = false)
-    private String password;
 
     @Column(name = "first_name")
     private String firstName;
@@ -33,8 +28,34 @@ public class User extends BaseEntity{
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @Column(name = "user_image")
+    private String userImage;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+
+    @Column(name = "login_attempt")
+    private Integer loginAttempt = 0;
+
+    @Column(name = "max_attempt")
+    private Integer maxAttempt = 3;
+
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+
+    @Column(name = "user_type", nullable = false)
+    private String userType;
+
+    private String gender;
+
+    @Column(name = "date_of_birth")
+    private String dateOfBirth;
 
     @Column(name = "status")
     private String status;
