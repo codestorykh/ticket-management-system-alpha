@@ -1,8 +1,11 @@
 package com.codestorykh.user.service.impl;
 
+import com.codestorykh.common.constant.ApiConstant;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
+import com.codestorykh.common.exception.SystemException;
 import com.codestorykh.user.constant.Constant;
-import com.codestorykh.user.dto.request.CreatePermissionRequestDTO;
-import com.codestorykh.user.dto.response.PermissionResponseDTO;
+import com.codestorykh.user.dto.request.CreatePermissionRequest;
+import com.codestorykh.user.dto.response.PermissionResponse;
 import com.codestorykh.user.entity.Permission;
 import com.codestorykh.user.entity.Role;
 import com.codestorykh.user.repository.PermissionRepository;
@@ -24,62 +27,62 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionRepository permissionRepository;
 
     @Override
-    public PermissionResponseDTO create(CreatePermissionRequestDTO permissionRequestDTO) {
-        if (permissionRepository.existsByName(permissionRequestDTO.getName())) {
-            throw new IllegalArgumentException("Permission with name '" + permissionRequestDTO.getName() + "' already exists");
+    public ResponseErrorTemplate create(CreatePermissionRequest permissionRequest) {
+        if (permissionRepository.existsByName(permissionRequest.name())) {
+            throw new SystemException("Permission with name '" + permissionRequest.name() + "' already exists");
         }
-        Permission permission = mapToPermission(permissionRequestDTO);
+        Permission permission = mapToPermission(permissionRequest);
         permissionRepository.save(permission);
 
-        return mapToPermissionResponse(permission);
+        return constructPermissionResponse(permission);
     }
 
     @Override
-    public PermissionResponseDTO update(Long id, CreatePermissionRequestDTO permissionDetails) {
+    public ResponseErrorTemplate update(Long id, CreatePermissionRequest permissionDetails) {
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Permission not found with id: " + id));
+                .orElseThrow(() -> new SystemException("Permission not found with id: " + id));
 
         // Check if the new name conflicts with existing permissions (excluding current permission)
-        if (!permission.getName().equals(permissionDetails.getName()) &&
-                permissionRepository.existsByName(permissionDetails.getName())) {
-            throw new IllegalArgumentException("Permission with name '" + permissionDetails.getName() + "' already exists");
+        if (!permission.getName().equals(permissionDetails.name()) &&
+                permissionRepository.existsByName(permissionDetails.name())) {
+            throw new SystemException("Permission with name '" + permissionDetails.name() + "' already exists");
         }
 
-        permission.setName(permissionDetails.getName());
-        permission.setDescription(permissionDetails.getDescription());
-        permission.setStatus(permissionDetails.getStatus());
+        permission.setName(permissionDetails.name());
+        permission.setDescription(permissionDetails.description());
+        permission.setStatus(permissionDetails.status());
 
         permissionRepository.save(permission);
 
-        return mapToPermissionResponse(permission);
+       return constructPermissionResponse(permission);
     }
 
     @Override
-    public PermissionResponseDTO assignRoleToPermission(Long permissionId, Long roleId) {
+    public ResponseErrorTemplate assignRoleToPermission(Long permissionId, Long roleId) {
         Permission permission = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new IllegalArgumentException("Permission not found with id: " + permissionId));
+                .orElseThrow(() -> new SystemException("Permission not found with id: " + permissionId));
 
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + roleId));
+                .orElseThrow(() -> new SystemException("Role not found with id: " + roleId));
 
         permission.addRole(role);
         permissionRepository.save(permission);
 
-        return mapToPermissionResponse(permission);
+       return constructPermissionResponse(permission);
     }
 
     @Override
-    public PermissionResponseDTO removeRoleFromPermission(Long permissionId, Long roleId) {
+    public ResponseErrorTemplate removeRoleFromPermission(Long permissionId, Long roleId) {
         Permission permission = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new IllegalArgumentException("Permission not found with id: " + permissionId));
+                .orElseThrow(() -> new SystemException("Permission not found with id: " + permissionId));
 
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found with id: " + roleId));
+                .orElseThrow(() -> new SystemException("Role not found with id: " + roleId));
 
         permission.removeRole(role);
         permissionRepository.save(permission);
 
-        return mapToPermissionResponse(permission);
+        return constructPermissionResponse(permission);
     }
 
     @Override
@@ -87,20 +90,30 @@ public class PermissionServiceImpl implements PermissionService {
         return permissionRepository.findAllByStatusAndNameIn(Constant.ACTIVE, names);
     }
 
-    private Permission mapToPermission(CreatePermissionRequestDTO request) {
+    private Permission mapToPermission(CreatePermissionRequest request) {
         Permission permission = new Permission();
-        permission.setName(request.getName());
-        permission.setDescription(request.getDescription());
+        permission.setName(request.name());
+        permission.setDescription(request.description());
         permission.setStatus(Constant.ACTIVE);
         return permission;
     }
 
-    private PermissionResponseDTO mapToPermissionResponse(Permission permission) {
-        PermissionResponseDTO response = new PermissionResponseDTO();
-        response.setId(permission.getId());
-        response.setName(permission.getName());
-        response.setDescription(permission.getDescription());
-        response.setStatus(permission.getStatus());
-        return response;
+    private ResponseErrorTemplate constructPermissionResponse(Permission permission) {
+        PermissionResponse permissionResponse = new PermissionResponse(
+                permission.getId(),
+                permission.getName(),
+                permission.getDescription(),
+                permission.getStatus(),
+                permission.getRoles(),
+                permission.getGroups()
+        );
+
+        return new ResponseErrorTemplate(
+                ApiConstant.SUCCESS.getDescription(),
+                ApiConstant.SUCCESS.getKey(),
+                permissionResponse,
+                false
+        );
     }
+
 }

@@ -1,7 +1,7 @@
 package com.codestorykh.user.service;
 
-import com.codestorykh.user.dto.request.CreatePermissionRequestDTO;
-import com.codestorykh.user.dto.response.PermissionResponseDTO;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
+import com.codestorykh.user.dto.request.CreatePermissionRequest;
 import com.codestorykh.user.entity.Permission;
 
 import java.util.List;
@@ -9,13 +9,13 @@ import java.util.Set;
 
 public interface PermissionService {
 
-    PermissionResponseDTO create(CreatePermissionRequestDTO permissionRequestDTO);
+    ResponseErrorTemplate create(CreatePermissionRequest permissionRequest);
 
-    PermissionResponseDTO update(Long id, CreatePermissionRequestDTO permissionRequestDTO);
+    ResponseErrorTemplate update(Long id, CreatePermissionRequest permissionRequest);
 
-    PermissionResponseDTO assignRoleToPermission(Long permissionId, Long roleId);
+    ResponseErrorTemplate assignRoleToPermission(Long permissionId, Long roleId);
 
-    PermissionResponseDTO removeRoleFromPermission(Long permissionId, Long roleId);
+    ResponseErrorTemplate removeRoleFromPermission(Long permissionId, Long roleId);
 
     List<Permission> getPermissionsByNameIn(Set<String> names);
 }

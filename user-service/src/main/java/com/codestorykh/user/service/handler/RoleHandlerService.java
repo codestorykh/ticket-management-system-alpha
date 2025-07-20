@@ -90,37 +90,6 @@ public class RoleHandlerService {
                 );
             }
 
-            // Validate code
-            if (roleRequest.code() == null || roleRequest.code().trim().isEmpty()) {
-                log.error("Role code is required");
-                return new ResponseErrorTemplate(
-                    "Role code is required",
-                    ApiConstant.INVALID_REQUEST.getKey(),
-                    new Object(),
-                    true
-                );
-            }
-
-            if (roleRequest.code().length() < 2 || roleRequest.code().length() > 20) {
-                log.error("Role code must be between 2 and 20 characters");
-                return new ResponseErrorTemplate(
-                    "Role code must be between 2 and 20 characters",
-                    ApiConstant.INVALID_REQUEST.getKey(),
-                    new Object(),
-                    true
-                );
-            }
-
-            if (!roleRequest.code().matches("^[A-Z0-9_]+$")) {
-                log.error("Role code can only contain uppercase letters, numbers, and underscores");
-                return new ResponseErrorTemplate(
-                    "Role code can only contain uppercase letters, numbers, and underscores",
-                    ApiConstant.INVALID_REQUEST.getKey(),
-                    new Object(),
-                    true
-                );
-            }
-
             // Validate description
             if (roleRequest.description() != null && roleRequest.description().length() > 500) {
                 log.error("Role description cannot exceed 500 characters");

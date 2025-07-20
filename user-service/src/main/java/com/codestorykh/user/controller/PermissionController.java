@@ -1,7 +1,8 @@
 package com.codestorykh.user.controller;
 
-import com.codestorykh.user.dto.request.CreatePermissionRequestDTO;
-import com.codestorykh.user.dto.response.PermissionResponseDTO;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
+import com.codestorykh.user.dto.request.CreatePermissionRequest;
+import com.codestorykh.user.dto.response.PermissionResponse;
 import com.codestorykh.user.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,43 +20,27 @@ public class PermissionController {
 
 
     @PostMapping
-    public ResponseEntity<PermissionResponseDTO> createPermission(@RequestBody CreatePermissionRequestDTO permission) {
-        try {
-            return ResponseEntity.ok(permissionService.create(permission));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<ResponseErrorTemplate> createPermission(@RequestBody CreatePermissionRequest permission) {
+        return ResponseEntity.ok(permissionService.create(permission));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PermissionResponseDTO> updatePermission(@PathVariable Long id,
-                                                                  @RequestBody CreatePermissionRequestDTO permissionDetails) {
-        try {
-            return ResponseEntity.ok(permissionService.update(id, permissionDetails));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ResponseErrorTemplate> updatePermission(@PathVariable Long id,
+                                                               @RequestBody CreatePermissionRequest permissionDetails) {
+        return ResponseEntity.ok(permissionService.update(id, permissionDetails));
     }
 
 
     @PostMapping("/{permissionId}/roles/{roleId}")
-    public ResponseEntity<PermissionResponseDTO> assignRoleToPermission(@PathVariable Long permissionId,
-                                                                        @PathVariable Long roleId) {
-        try {
-            return ResponseEntity.ok(permissionService.assignRoleToPermission(permissionId, roleId));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ResponseErrorTemplate> assignRoleToPermission(@PathVariable Long permissionId,
+                                                                     @PathVariable Long roleId) {
+        return ResponseEntity.ok(permissionService.assignRoleToPermission(permissionId, roleId));
     }
 
     @DeleteMapping("/{permissionId}/roles/{roleId}")
-    public ResponseEntity<PermissionResponseDTO> removeRoleFromPermission(@PathVariable Long permissionId,
-                                                                          @PathVariable Long roleId) {
-        try {
-            return ResponseEntity.ok(permissionService.removeRoleFromPermission(permissionId, roleId));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ResponseErrorTemplate> removeRoleFromPermission(@PathVariable Long permissionId,
+                                                                       @PathVariable Long roleId) {
+        return ResponseEntity.ok(permissionService.removeRoleFromPermission(permissionId, roleId));
     }
 
 } 

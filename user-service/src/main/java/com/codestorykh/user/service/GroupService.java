@@ -1,16 +1,16 @@
 package com.codestorykh.user.service;
 
-import com.codestorykh.user.dto.request.CreateGroupRequestDTO;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
+import com.codestorykh.user.dto.request.CreateGroupRequest;
 import com.codestorykh.user.dto.request.GroupMemberRequest;
-import com.codestorykh.user.dto.response.GroupResponseDTO;
 
 public interface GroupService {
 
-    GroupResponseDTO createGroup(CreateGroupRequestDTO request);
+    ResponseErrorTemplate createGroup(CreateGroupRequest request);
 
-    GroupResponseDTO updateGroup(Long id, CreateGroupRequestDTO request);
+    ResponseErrorTemplate updateGroup(Long id, CreateGroupRequest request);
 
-    GroupResponseDTO addMembersToGroup(Long groupId, GroupMemberRequest groupMemberRequest);
+    ResponseErrorTemplate addMembersToGroup(Long groupId, GroupMemberRequest groupMemberRequest);
 
-    GroupResponseDTO removeMembersFromGroup(Long groupId, GroupMemberRequest groupMemberRequest);
+    ResponseErrorTemplate removeMembersFromGroup(Long groupId, GroupMemberRequest groupMemberRequest);
 }
