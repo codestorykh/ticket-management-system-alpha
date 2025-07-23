@@ -38,7 +38,7 @@ public class PublicController {
 
     @PostMapping("/login")
     public ResponseEntity<ResponseErrorTemplate> login(@RequestBody AuthenticationRequest authenticationRequest) {
-        return ResponseEntity.ok(authService.login(authenticationRequest.username()));
+        return ResponseEntity.ok(authService.login(authenticationRequest));
     }
 
     @PostMapping("/logout")

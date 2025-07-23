@@ -58,11 +58,6 @@ public class CustomSecurityFilterChain extends JwtConfigProperties {
                         .requestMatchers(
                                 "api/public/users/**")
                         .permitAll()
-                        .requestMatchers("/swagger-ui/**",
-                                "/swagger-resources/*",
-                                "/v3/api-docs/**",
-                                "loan-api-docs/**")
-                        .permitAll()
                         .requestMatchers("/api/users/**")
                         .hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers("/api/roles/**")
