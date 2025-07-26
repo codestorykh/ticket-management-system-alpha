@@ -1,9 +1,11 @@
 package com.codestorykh.user.service.impl;
 
+import com.codestorykh.common.constant.ApiConstant;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
 import com.codestorykh.user.constant.Constant;
-import com.codestorykh.user.dto.request.CreateGroupRequestDTO;
+import com.codestorykh.user.dto.request.CreateGroupRequest;
 import com.codestorykh.user.dto.request.GroupMemberRequest;
-import com.codestorykh.user.dto.response.GroupResponseDTO;
+import com.codestorykh.user.dto.response.GroupResponse;
 import com.codestorykh.user.entity.Group;
 import com.codestorykh.user.entity.Permission;
 import com.codestorykh.user.entity.Role;
@@ -34,16 +36,16 @@ public class GroupServiceImpl implements GroupService {
 
 
     @Override
-    public GroupResponseDTO createGroup(CreateGroupRequestDTO request) {
-        if (groupRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Group with name '" + request.getName() + "' already exists");
+    public ResponseErrorTemplate createGroup(CreateGroupRequest request) {
+        if (groupRepository.existsByName(request.name())) {
+            throw new RuntimeException("Group with name '" + request.name() + "' already exists");
         }
 
-        Set<Role> roles = request.getRoles() != null
-                ? new HashSet<>(roleRepository.findByNameIn(request.getRoles()))
+        Set<Role> roles = request.roles() != null
+                ? new HashSet<>(roleRepository.findByNameIn(request.roles()))
                 : Set.of();
-        Set<Permission> permissions = request.getPermissions() != null
-                ? new HashSet<>(permissionService.getPermissionsByNameIn(request.getPermissions()))
+        Set<Permission> permissions = request.permissions() != null
+                ? new HashSet<>(permissionService.getPermissionsByNameIn(request.permissions()))
                 : Set.of();
 
         Group group = mapToGroup(request);
@@ -51,45 +53,46 @@ public class GroupServiceImpl implements GroupService {
         group.setPermissions(permissions);
 
         groupRepository.save(group);
-        return mapToDto(group);
+        return constructGroupResponse(group);
     }
 
     @Override
-    public GroupResponseDTO updateGroup(Long groupId, CreateGroupRequestDTO request) {
+    public ResponseErrorTemplate updateGroup(Long groupId, CreateGroupRequest request) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + groupId));
 
-        if (request.getName() != null && !request.getName().equals(group.getName())) {
-            if (groupRepository.existsByName(request.getName())) {
-                throw new RuntimeException("Group with name '" + request.getName() + "' already exists");
+        final String groupName = request.name();
+        if (groupName != null && !groupName.equals(group.getName())) {
+            if (groupRepository.existsByName(groupName)) {
+                throw new RuntimeException("Group with name '" + groupName + "' already exists");
             }
-            group.setName(request.getName());
+            group.setName(groupName);
         }
 
-        if (request.getDescription() != null) {
-            group.setDescription(request.getDescription());
+        if (request.description() != null) {
+            group.setDescription(request.description());
         }
 
-        if (request.getRoles() != null) {
-            Set<Role> roles = new HashSet<>(roleRepository.findByNameIn(request.getRoles()));
+        if (request.roles() != null) {
+            Set<Role> roles = new HashSet<>(roleRepository.findByNameIn(request.roles()));
             group.setRoles(roles);
         }
 
-        if (request.getPermissions() != null) {
-            Set<Permission> permissions = new HashSet<>(permissionService.getPermissionsByNameIn(request.getPermissions()));
+        if (request.permissions() != null) {
+            Set<Permission> permissions = new HashSet<>(permissionService.getPermissionsByNameIn(request.permissions()));
             group.setPermissions(permissions);
         }
 
-        if (StringUtils.hasText(request.getStatus())) {
-            group.setStatus(request.getStatus());
+        if (StringUtils.hasText(request.status())) {
+            group.setStatus(request.status());
         }
         groupRepository.save(group);
 
-        return mapToDto(group);
+        return constructGroupResponse(group);
     }
 
     @Override
-    public GroupResponseDTO addMembersToGroup(Long groupId, GroupMemberRequest groupMemberRequest) {
+    public ResponseErrorTemplate addMembersToGroup(Long groupId, GroupMemberRequest groupMemberRequest) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + groupId));
 
@@ -103,11 +106,11 @@ public class GroupServiceImpl implements GroupService {
 
         groupRepository.save(group);
 
-        return mapToDto(group);
+        return constructGroupResponse(group);
     }
 
     @Override
-    public GroupResponseDTO removeMembersFromGroup(Long groupId, GroupMemberRequest groupMemberRequest) {
+    public ResponseErrorTemplate removeMembersFromGroup(Long groupId, GroupMemberRequest groupMemberRequest) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + groupId));
 
@@ -118,30 +121,37 @@ public class GroupServiceImpl implements GroupService {
         }
 
         Group updatedGroup = groupRepository.save(group);
-        return mapToDto(updatedGroup);
+        return constructGroupResponse(updatedGroup);
     }
 
 
-    private GroupResponseDTO mapToDto(Group group) {
-        return GroupResponseDTO.builder()
-                .id(group.getId())
-                .name(group.getName())
-                .description(group.getDescription())
-                .roles(group.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toSet()))
-                .permissions(group.getPermissions().stream().map(Permission::getName).collect(java.util.stream.Collectors.toSet()))
-                .status(group.getStatus())
-                .createdBy(group.getCreatedBy())
-                .updatedBy(group.getUpdatedBy())
-                .createdAt(group.getCreatedAt())
-                .updatedAt(group.getUpdatedAt())
-                .memberCount(group.getUsers().size())
-                .build();
+    private ResponseErrorTemplate constructGroupResponse(Group group) {
+        GroupResponse groupResponse = new  GroupResponse(
+                group.getId(),
+                group.getName(),
+                group.getDescription(),
+                group.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toSet()),
+                group.getPermissions().stream().map(Permission::getName).collect(java.util.stream.Collectors.toSet()),
+                group.getStatus(),
+                group.getCreatedBy(),
+                group.getUpdatedBy(),
+                group.getCreatedAt(),
+                group.getUpdatedAt(),
+                group.getUsers().size()
+        );
+        return new ResponseErrorTemplate(
+                ApiConstant.SUCCESS.getDescription(),
+                ApiConstant.SUCCESS.getKey(),
+                groupResponse,
+                false
+        );
+
     }
 
-    private Group mapToGroup(CreateGroupRequestDTO request) {
+    private Group mapToGroup(CreateGroupRequest request) {
         Group group = new Group();
-        group.setName(request.getName());
-        group.setDescription(request.getDescription());
+        group.setName(request.name());
+        group.setDescription(request.description());
         group.setStatus(Constant.ACTIVE);
 
         return group;

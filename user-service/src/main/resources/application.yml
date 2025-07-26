@@ -19,3 +19,14 @@ spring:
           dialect: org.hibernate.dialect.PostgreSQLDialect
           format_sql: true
       defer-datasource-initialization: true
+
+# JWT CONFIG
+# Key secret generate JwtSecret.generateNewSecret()
+# expiration 3600 seconds equal 1 hour
+jwt:
+  url: '/authorization'
+  header: 'Authorization'
+  prefix: 'Bearer '
+  expiration: 120
+  secret: '+2ZRPSIf72kFPBiYmg+VK+kt4VB7iGnSab0i/yOFA7S6cvrh99QOQmSpcS6H0kDqOdB0gM0UP6nUJxXh+A=='
+  default-password: 'mypwd@123'
