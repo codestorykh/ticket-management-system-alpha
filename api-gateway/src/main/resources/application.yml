@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  r2dbc:
+    url: ${SPRING_DATASOURCE_URL:r2dbc:postgresql://localhost:5432/ticketdb}
+    username: ${SPRING_DATASOURCE_USERNAME:ticketuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:ticketpass}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
