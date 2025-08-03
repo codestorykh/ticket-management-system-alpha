@@ -4,6 +4,17 @@ server:
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 3000 # 3 seconds
+            response-timeout: 5s
+            pool:
+              acquire-timeout: 4500 # 4.5 seconds
+              max-life-time: 60s
+              max-idle-time: 15s
 
   r2dbc:
     url: ${SPRING_DATASOURCE_URL:r2dbc:postgresql://localhost:5432/ticketdb}
@@ -13,3 +24,43 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
+
+gateway:
+  logging:
+    enabled: true
+    level: INFO
+    log-request-body: false
+    log-response-body: true
+    log-headers: true
+    mask-sensitive-headers: true
+    sensitive-headers:
+      - authorization
+      - x-api-key
+      - x-auth-token
+      - cookie
+      - set-cookie
+      - x-forwarded-for
+      - x-real-ip
+      - password
+    sensitive-fields:
+      - password
+      - token
+      - secret
+      - key
+      - credential
+    max-body-length: 1000
+    log-performance: true
+    log-error-stack-traces: true
+    include-request-id: true
+    log-request-metrics: true
+    excluded-paths:
+      - /health
+      - /actuator/health
+      - /actuator/info
+    enable-correlation-id: true
+    correlation-id-header: X-Correlation-ID
+    log-user-agent: true
+    log-client-ip: true
+    log-request-size: true
+    log-response-size: true
+    service-name: api-gateway
