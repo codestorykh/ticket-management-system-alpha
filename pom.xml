@@ -17,7 +17,8 @@
 	<modules>
 		<module>user-service</module>
 		<module>common</module>
-	</modules>
+        <module>api-gateway</module>
+    </modules>
 
 	<packaging>pom</packaging>
 	<url/>
