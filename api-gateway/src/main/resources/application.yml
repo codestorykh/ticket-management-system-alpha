@@ -64,3 +64,8 @@ gateway:
     log-request-size: true
     log-response-size: true
     service-name: api-gateway
+
+# User service configuration
+user:
+  service:
+    url: ${USER_SERVICE_URL:http://localhost:8081}

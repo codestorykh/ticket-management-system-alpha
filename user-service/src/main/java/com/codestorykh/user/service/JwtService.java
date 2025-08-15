@@ -1,5 +1,6 @@
 package com.codestorykh.user.service;
 
+import com.codestorykh.common.exception.ResponseErrorTemplate;
 import com.codestorykh.user.entity.CustomUserDetail;
 import io.jsonwebtoken.Claims;
 
@@ -12,4 +13,6 @@ public interface JwtService {
     String generateToken(com.codestorykh.user.entity.CustomUserDetail customUserDetail);
     String refreshToken(CustomUserDetail customUserDetail);
     boolean isValidToken(String token);
+    ResponseErrorTemplate verifyToken(String authorizationHeader);
+
 }

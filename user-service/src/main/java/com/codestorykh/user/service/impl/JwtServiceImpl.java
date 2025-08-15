@@ -2,6 +2,7 @@ package com.codestorykh.user.service.impl;
 
 import com.codestorykh.common.dto.EmptyObject;
 import com.codestorykh.common.exception.CustomMessageException;
+import com.codestorykh.common.exception.ResponseErrorTemplate;
 import com.codestorykh.user.config.properties.JwtConfigProperties;
 import com.codestorykh.user.entity.CustomUserDetail;
 import com.codestorykh.user.jwt.JwtSecret;
@@ -17,9 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -92,6 +91,51 @@ public class JwtServiceImpl extends JwtConfigProperties implements JwtService {
 
         UserDetails userDetails = userDetailService.loadUserByUsername(username);
         return userDetails != null;
+    }
+
+    @Override
+    public ResponseErrorTemplate verifyToken(String authorizationHeader) {
+        try {
+            // Remove "Bearer " prefix if present
+            String token = authorizationHeader;
+            if (authorizationHeader.startsWith("Bearer ")) {
+                token = authorizationHeader.substring(7);
+            }
+
+            // Verify token validity
+            if (!isValidToken(token)) {
+                return new ResponseErrorTemplate(
+                        "Invalid token",
+                        "TOKEN_INVALID",
+                        new EmptyObject(),
+                        true);
+            }
+
+            // Extract claims
+            Claims claims = extractClaims(token);
+            String username = claims.getSubject();
+            List authorities = claims.get("authorities", List.class);
+
+            // Create response data
+            Map<String, Object> tokenData = new HashMap<>();
+            tokenData.put("username", username);
+            tokenData.put("authorities", authorities);
+            tokenData.put("valid", true);
+
+            return new ResponseErrorTemplate(
+                    "Token is valid",
+                    "TOKEN_VALID",
+                    tokenData,
+                    false);
+
+        } catch (Exception ex) {
+            log.error("Token verification failed: {}", ex.getMessage());
+            return new ResponseErrorTemplate(
+                    "Token verification failed",
+                    "TOKEN_VERIFICATION_FAILED",
+                    new EmptyObject(),
+                    true);
+        }
     }
 
     private String extractUsername(String token) {

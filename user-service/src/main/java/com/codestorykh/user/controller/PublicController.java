@@ -10,13 +10,16 @@ import com.codestorykh.user.service.AuthService;
 import com.codestorykh.user.service.UserService;
 import com.codestorykh.user.service.impl.CustomUserDetailService;
 import com.codestorykh.user.service.impl.RefreshTokenService;
+import com.codestorykh.user.service.JwtService;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -29,6 +32,7 @@ public class PublicController {
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final CustomUserDetailService customUserDetailService;
+    private final JwtService jwtService;
 
     @PostMapping("/registration")
     public ResponseEntity<ResponseErrorTemplate> register(@RequestBody UserRequest userRequest) {
@@ -56,6 +60,17 @@ public class PublicController {
     @PostMapping("/refreshToken")
     public ResponseEntity<ResponseErrorTemplate> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(refreshTokenService.refreshToken(refreshTokenRequest));
+    }
+
+    @PostMapping("/verify-token")
+    public ResponseEntity<ResponseErrorTemplate> verifyToken(@RequestHeader("Authorization") String authorizationHeader) {
+        log.info("Intercept token verification request");
+        
+        var responseErrorTemplate = jwtService.verifyToken(authorizationHeader);
+        if (responseErrorTemplate.isError()) {
+            return ResponseEntity.status(401).body(responseErrorTemplate);
+        }
+        return ResponseEntity.status(200).body(responseErrorTemplate);
     }
 
 }
