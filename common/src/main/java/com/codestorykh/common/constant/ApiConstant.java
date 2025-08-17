@@ -41,7 +41,9 @@ public enum ApiConstant {
     // Status codes
     ACTIVE("ACTIVE", "Active"),
     IN_ACTIVE("INACTIVE", "Inactive"),
-    BLK("BLOCK", "Blocked");
+    BLK("BLOCK", "Blocked"),
+
+    DATA_NOT_FOUND("404", "Data not found for %s.");
 
     private final String key;
     private final String description;
