@@ -41,7 +41,14 @@ public enum ApiConstant {
     // Status codes
     ACTIVE("ACTIVE", "Active"),
     IN_ACTIVE("INACTIVE", "Inactive"),
-    BLK("BLOCK", "Blocked");
+    BLK("BLOCK", "Blocked"),
+
+    SEAT_NUMBER_ALREADY_EXISTS("400", "Seat number %s already exists."),
+    EVENT_NOT_FOUND("404", "Event not found for ID %s."),
+    TICKET_NOT_FOUND("404", "Ticket not found for ID %s."),
+    TICKET_LOCKED("423", "Ticket is locked for ID %s."),
+    TICKET_NOT_AVAILABLE("404", "Ticket not available for ID %s."),
+    DATA_NOT_FOUND("404", "Data not found for %s.");
 
     private final String key;
     private final String description;
