@@ -19,6 +19,7 @@
 		<module>common</module>
         <module>api-gateway</module>
 		<module>event-service</module>
+		<module>ticket-service</module>
 	</modules>
 
 	<packaging>pom</packaging>

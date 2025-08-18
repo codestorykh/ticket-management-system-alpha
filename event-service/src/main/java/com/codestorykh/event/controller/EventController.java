@@ -19,7 +19,7 @@ public class EventController {
     }
 
     @PostMapping()
-    public ResponseEntity<ResponseErrorTemplate> register(@RequestBody EventRequest eventRequest) {
+    public ResponseEntity<ResponseErrorTemplate> create(@RequestBody EventRequest eventRequest) {
         log.info("Intercept create new event with req: {}", eventRequest);
         return ResponseEntity.ok(eventService.create(eventRequest));
     }

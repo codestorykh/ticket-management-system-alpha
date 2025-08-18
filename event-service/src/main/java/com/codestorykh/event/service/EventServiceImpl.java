@@ -68,15 +68,18 @@ public class EventServiceImpl implements EventService{
     @Override
     public ResponseErrorTemplate getById(Long id) {
         Optional<Event> event = eventRepository.findById(id);
-        return event.map(value -> new ResponseErrorTemplate(
+        if(event.isEmpty()){
+            return new ResponseErrorTemplate(
+                    ApiConstant.DATA_NOT_FOUND.getDescription(),
+                    ApiConstant.DATA_NOT_FOUND.getKey(),
+                    new EmptyObject(),
+                    true);
+        }
+        return new ResponseErrorTemplate(
                 ApiConstant.SUCCESS.getDescription(),
                 ApiConstant.SUCCESS.getKey(),
-                eventMapper.toResponse(value),
-                false)).orElseGet(() -> new ResponseErrorTemplate(
-                ApiConstant.DATA_NOT_FOUND.getDescription(),
-                ApiConstant.DATA_NOT_FOUND.getKey(),
-                new EmptyObject(),
-                true));
+                eventMapper.toResponse(event.get()),
+                false);
 
     }
 
