@@ -20,7 +20,8 @@
         <module>api-gateway</module>
 		<module>event-service</module>
 		<module>ticket-service</module>
-	</modules>
+        <module>order-service</module>
+    </modules>
 
 	<packaging>pom</packaging>
 	<url/>
