@@ -43,6 +43,9 @@ public enum ApiConstant {
     IN_ACTIVE("INACTIVE", "Inactive"),
     BLK("BLOCK", "Blocked"),
 
+    PAYMENT_FAILED("400", "Payment processing failed for order ID %s."),
+    PAYMENT_SUCCESS("200", "Payment processed successfully for order ID %s."),
+
     SEAT_NUMBER_ALREADY_EXISTS("400", "Seat number %s already exists."),
     EVENT_NOT_FOUND("404", "Event not found for ID %s."),
     TICKET_NOT_FOUND("404", "Ticket not found for ID %s."),

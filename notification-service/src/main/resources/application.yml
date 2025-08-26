@@ -1,9 +1,9 @@
 server:
-  port: 8084
+  port: 8086
 
 spring:
   application:
-    name: order-service
+    name: notification-service
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ticketdb}
@@ -23,7 +23,7 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
-  # Kafka
+# Kafka
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}, localhost:29092
     consumer:
@@ -34,16 +34,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringDeserializer
       value-serializer: org.apache.kafka.common.serialization.StringDeserializer
-# Service
-service:
-  event:
-    url: ${EVENT_SERVICE_URL:http://localhost:8082/api/v1/tickets}
-  user:
-    url: ${USER_SERVICE_URL:http://localhost:8081}
-  payment:
-    url: ${PAYMENT_SERVICE_URL:http://localhost:8085/api/v1/payments}
-
 # Notification
 notification:
+  email:
+    from: noreply@ticketmanagement.com
   topic:
     order-confirmed: order-confirmed-topic

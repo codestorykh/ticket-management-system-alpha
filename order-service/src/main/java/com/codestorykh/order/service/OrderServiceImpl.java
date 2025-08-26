@@ -3,20 +3,24 @@ package com.codestorykh.order.service;
 import com.codestorykh.common.constant.ApiConstant;
 import com.codestorykh.common.dto.EmptyObject;
 import com.codestorykh.common.exception.ResponseErrorTemplate;
+import com.codestorykh.order.client.PaymentClient;
 import com.codestorykh.order.client.UserClient;
+import com.codestorykh.order.dto.OrderConfirmedEvent;
 import com.codestorykh.order.dto.OrderRequest;
+import com.codestorykh.order.dto.PaymentRequest;
 import com.codestorykh.order.entity.Order;
 import com.codestorykh.order.enumz.OrderStatus;
+import com.codestorykh.order.enumz.PaymentMethod;
 import com.codestorykh.order.mapper.OrderMapper;
+import com.codestorykh.order.producer.OrderConfirmedKafkaProducer;
 import com.codestorykh.order.repository.OrderRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 @Service
@@ -25,14 +29,19 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderMapper orderMapper;
     private final UserClient userClient;
+    private final PaymentClient paymentClient;
     private final OrderRepository orderRepository;
+    private final OrderConfirmedKafkaProducer orderConfirmedKafkaProducer;
 
     public OrderServiceImpl(OrderMapper orderMapper,
-                            UserClient userClient,
-                            OrderRepository orderRepository) {
+                            UserClient userClient, PaymentClient paymentClient,
+                            OrderRepository orderRepository,
+                            OrderConfirmedKafkaProducer orderConfirmedKafkaProducer) {
         this.orderMapper = orderMapper;
         this.userClient = userClient;
+        this.paymentClient = paymentClient;
         this.orderRepository = orderRepository;
+        this.orderConfirmedKafkaProducer = orderConfirmedKafkaProducer;
     }
 
     @Override
@@ -57,6 +66,47 @@ public class OrderServiceImpl implements OrderService{
         order.setOrderDate(LocalDateTime.now());
 
         orderRepository.save(order);
+
+        // Process payment: can move to new method or service
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setOrderId(order.getId());
+        paymentRequest.setUsername(username);
+        paymentRequest.setAmount(orderRequest.getAmount());
+        paymentRequest.setCurrency("USD");
+        paymentRequest.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+        paymentRequest.setDescription("Payment for order ID: " + order.getId());
+
+        ResponseErrorTemplate paymentResponse = paymentClient.processingPayment(paymentRequest)
+                .block();
+
+        if(paymentResponse == null || paymentResponse.isError()) {
+            log.error("Payment processing failed for order ID: {}", order.getId());
+            return new ResponseErrorTemplate(
+                    ApiConstant.PAYMENT_FAILED.getDescription(),
+                    ApiConstant.PAYMENT_FAILED.getKey(),
+                    new EmptyObject(),
+                    true);
+        }
+
+        order.setOrderStatus(OrderStatus.COMPLETED);
+        Integer paymentId = (Integer) ((LinkedHashMap<?, ?>) paymentResponse.data()).get("paymentId");
+        order.setPaymentId(Long.valueOf(paymentId));
+        orderRepository.save(order);
+
+        // Send order confirmed event to Kafka
+        OrderConfirmedEvent orderConfirmedEvent = new OrderConfirmedEvent();
+        orderConfirmedEvent.setOrderId(order.getId());
+        orderConfirmedEvent.setUsername(order.getUsername());
+        orderConfirmedEvent.setEmail("codestorykh@gmail.com"); // need to get from user service
+        orderConfirmedEvent.setPhoneNumber("0123456789"); // need to get from user service
+        orderConfirmedEvent.setEventTitle(orderRequest.getEventId().toString()); // need to get from event service
+        orderConfirmedEvent.setEventLocation(orderRequest.getEventId().toString()); // need to get from event service
+        orderConfirmedEvent.setEventDate(LocalDateTime.now());
+        orderConfirmedEvent.setQuantity(orderRequest.getQuantity());
+        orderConfirmedEvent.setAmount(orderRequest.getAmount());
+
+        orderConfirmedKafkaProducer.send(orderConfirmedEvent);
+
         return new ResponseErrorTemplate(
                 ApiConstant.SUCCESS.getDescription(),
                 ApiConstant.SUCCESS.getKey(),
